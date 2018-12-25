@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 import { md5 } from 'utility'
 const Schema = mongoose.Schema
 
@@ -17,17 +17,17 @@ const UserSchema = new Schema({
   },
   role: {
     type: String, 
-    enum: ['User', 'Admin'],
+    enum: ['User', 'Admin', 'Seller'],
     default: 'User' 
   },
   phoneNumber: {
     type: String, 
-    required: [true, 'phoneNumber required~~~~~'],
+    required: [true, 'phoneNumber required @_@~'],
     validate: {
       validator: function(data) {
         return /\d{3}-\d{4}-\d{4}/.test(data)
       },
-      message: '{VALUE} is not a valid phone number!'
+      message: '{VALUE} is not a valid phone number @_@~'
     },
   },
   email: {
@@ -36,7 +36,7 @@ const UserSchema = new Schema({
   },
   password: {
     type: String, 
-    required: [true, 'password required!']
+    required: [true, 'password required @_@~']
   },
   lock: {
     until: Number,
