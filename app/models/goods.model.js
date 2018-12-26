@@ -1,20 +1,26 @@
-// # 关于计算
-// 1. 单价---计算单位---单位补充文字 --- 算总价
-// 2. 10元 * 1kg --- 每千克大约4-5个 --- 10元/kg * n = totalPrice
-// 3. 10元 * 1个 --- 每个大约2斤     --- 10元/个 * n = totalPrice （算出重量单价 10/2 元/kg）
-
-// Unit Price calcUnit: String
-
 import mongoose from 'mongoose'
 
 const Schema = mongoose.Schema
+const ObjectId = Schema.Types.ObjectId
+const materialSchema = new Schema({
+  name: String,
+  desc: String,
+  preview: String
+})
+const wrappingsSchema = new Schema({
+  name: String,
+  desc: String,
+  preview: String
+})
 const GoodsSchema = new Schema({
   title: {
     type: String, 
-    required: [true, 'title required @_@~']
+    required: [true, 'title required @_@~'],
+    trim: true
   },
   desc: {
     type: String, 
+    default: '',
     trim: true
   },
   price: {
@@ -35,18 +41,42 @@ const GoodsSchema = new Schema({
     required: [true, 'preview required @_@~']
   },
   pictures: [String],
-  tags: [],
-  scope: String, // 配送范围
-  material: [],
-  wrappings: [],
-  // details: String,// /Goods/:goodsID
-  content: String,
-  user: String,
-  shop: String,
+  tags: [{
+    type: ObjectId,
+    ref: 'Tag'
+  }],
+  scope: {
+    type: String,
+    default: ''
+  },
+  // 会生成id，不会生成独立的 collection
+  material: [materialSchema],
+  wrappings: [wrappingsSchema],
+  content: {
+    type: String,
+    default: ''
+  },
+  user: {
+    type: ObjectId,
+    ref: 'User'
+  },
+  shop: {
+    type: ObjectId,
+    ref: 'Shop'
+  },
   meta: {
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
   }
+})
+
+GoodsSchema.pre('save', function (next) {
+  if (this.isNew) {
+    this.meta.createdAt = this.meta.updatedAt = Date.now()
+  } else {
+    this.meta.updatedAt = Date.now()
+  }
+  next()
 })
 
 const Goods = mongoose.model('Goods', GoodsSchema)

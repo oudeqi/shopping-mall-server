@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 import { md5 } from 'utility'
 const Schema = mongoose.Schema
+const ObjectId = Schema.Types.ObjectId
 
 const salt = 'dfg_4$*65_ZX4_&12'
 const MAX_LOGIN_ATTEMPTS = 5 // 登录的最大失败尝试次数
@@ -25,7 +26,7 @@ const UserSchema = new Schema({
     required: [true, 'phoneNumber required @_@~'],
     validate: {
       validator: function(data) {
-        return /\d{3}-\d{4}-\d{4}/.test(data)
+        return /^1(3|4|5|7|8)\d{9}$/.test(data)
       },
       message: '{VALUE} is not a valid phone number @_@~'
     },
@@ -39,13 +40,22 @@ const UserSchema = new Schema({
     required: [true, 'password required @_@~']
   },
   lock: {
-    until: Number,
-    attempts: { type: Number, required: true, default: 0 },
+    until: { type: Number, default: 0 },
+    attempts: { type: Number, default: 0 },
   },
   wechat: {
     openID: [String],
     unionID: String
   },
+  shops: [{
+    type: ObjectId,
+    ref: 'Shop'
+  }], // 商家才有
+  // follow: {
+  //   shops: [{type: ObjectId, ref: 'Shop'}],
+  //   goods: [{type: ObjectId, ref: 'Goods'}],
+  //   users: [{type: ObjectId, ref: 'User'}]
+  // },
   meta: {
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }

@@ -10,8 +10,11 @@ import logger from 'koa-logger'
 import helmet from 'koa-helmet'
 import nunjucks from 'koa-nunjucks-2'
 // 导入 rouer.js 文件
-import api from './router/api'
-import page from './router/page'
+import userApi from './router/user/api'
+import userPage from './router/user/page'
+
+import sellerApi from './router/seller/api'
+import sellerPage from './router/seller/page'
 
 // 连接数据库
 import { mongodb } from './config'
@@ -59,9 +62,12 @@ app.use(nunjucks({
   }
 }))
 
-// 载入路由
-app.use(page.routes(), page.allowedMethods())
-app.use(api.routes(), api.allowedMethods())
+// 载入路由 
+app.use(userPage.routes(), userPage.allowedMethods())
+app.use(userApi.routes(), userApi.allowedMethods())
+
+app.use(sellerPage.routes(), userPage.allowedMethods())
+app.use(sellerApi.routes(), userApi.allowedMethods())
 
 // error-handling
 app.on('error', (err, ctx) => {
