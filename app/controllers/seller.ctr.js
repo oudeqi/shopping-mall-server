@@ -34,5 +34,27 @@ export default class Seller {
       }
     }
   }
+  /**
+   * 用户登录
+   */
+  static async login (ctx, next) {
+    const { phoneNumber, password } = ctx.request.body
+    const user = await UserModel.findOne(
+      { phoneNumber, password: UserModel.encrypt(password)}, 
+      { password: 0, __v: 0 }
+    )
+    if (user) {
+      ctx.session.user = user._doc
+      return ctx.body = {
+        success: true,
+        data: {...user._doc, password: undefined}
+      }
+    } else {
+      return ctx.body = {
+        success: false,
+        msg: '用户名或密码错误'
+      }
+    }
+  }
 }
 

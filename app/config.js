@@ -1,4 +1,4 @@
-const port = 3000
+const port = 5000
 const mongodb = 'mongodb://localhost:27017/shopping-mall'
 const wechat = {
   appID: 'wxbe9627c9477c7a51',

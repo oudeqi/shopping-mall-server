@@ -2,33 +2,31 @@ import Koa from 'koa'
 import body from 'koa-body'
 import koaStatic from 'koa-static'
 import session from 'koa-session'
-import cors from 'koa-cors'
+import cors from 'koa2-cors'
 import compress from 'koa-compress'
 import cacheControl from 'koa-cache-control'
 import onerror from 'koa-onerror'
 import logger from 'koa-logger'
 import helmet from 'koa-helmet'
 import nunjucks from 'koa-nunjucks-2'
+import MongooseStore from './service/MongooseStore'
+import env from './service/env'
+
 // 导入 rouer.js 文件
 import userApi from './router/user/api'
 import userPage from './router/user/page'
-
 import sellerApi from './router/seller/api'
 import sellerPage from './router/seller/page'
 
 // 连接数据库
-import { mongodb } from './config'
-import connectDB from './models/connect'
-connectDB(mongodb)
+import { mongodb, port } from './config'
+import connect from './service/mongo'
+connect(mongodb)
 
 const app = new Koa()
-// 在使用 koa-session 之前，必须需要指定一个私钥
-// 用于加密存储在 session 中的数据
-app.keys = ['some secret hurr']
-
-// 将捕获的错误消息生成友好的错误页面（仅限开发环境）
-onerror(app)
-
+if (env.dev) { // 将捕获的错误消息生成友好的错误页面（仅限开发环境）
+  onerror(app)
+}
 // 在命令行打印日志
 app.use(logger())
 // 缓存控制
@@ -41,8 +39,10 @@ app.use(cors({ credentials: true }))
 app.use(helmet())
 // 静态资源服务器
 app.use(koaStatic(__dirname + '/static'))
-// session
-app.use(session(app))
+// 在使用 koa-session 之前，必须需要指定一个私钥
+// 用于加密存储在 session 中的数据
+app.keys = ['some secret key'];
+app.use(session({ store: new MongooseStore() }, app))
 // 解析 sequest body
 // 开启了多文件上传，并设置了文件大小限制
 app.use(body({
@@ -61,24 +61,16 @@ app.use(nunjucks({
     trimBlocks: true // 开启转义 防Xss
   }
 }))
-
-// 载入路由 
 app.use(userPage.routes(), userPage.allowedMethods())
 app.use(userApi.routes(), userApi.allowedMethods())
-
 app.use(sellerPage.routes(), userPage.allowedMethods())
 app.use(sellerApi.routes(), userApi.allowedMethods())
-
-// error-handling
 app.on('error', (err, ctx) => {
   console.error('server error', err, ctx)
-});
-
-// 启动一个 http 服务器，并监听 3000 端口
-app.listen(5000, () => {
-  console.log(`server start at port 5000`)
 })
-
+app.listen(port, () => {
+  console.log(`server start at port ${port}`)
+})
 // 导出 koa 实例（用于测试）
 export default app
 
