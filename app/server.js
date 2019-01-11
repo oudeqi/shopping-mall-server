@@ -13,15 +13,13 @@ import MongooseStore from './service/MongooseStore'
 import env from './service/env'
 
 // 导入 rouer.js 文件
-import userApi from './router/user/api'
-import userPage from './router/user/page'
-import sellerApi from './router/seller/api'
-import sellerPage from './router/seller/page'
+import api from './router/api'
+import page from './router/page'
 
 // 连接数据库
-import { mongodb, port } from './config'
+import * as config from './config' //  { mongodb, port } 
 import connect from './service/mongo'
-connect(mongodb)
+connect(config.mongodb)
 
 const app = new Koa()
 if (env.dev) { // 将捕获的错误消息生成友好的错误页面（仅限开发环境）
@@ -61,14 +59,12 @@ app.use(nunjucks({
     trimBlocks: true // 开启转义 防Xss
   }
 }))
-app.use(userPage.routes(), userPage.allowedMethods())
-app.use(userApi.routes(), userApi.allowedMethods())
-app.use(sellerPage.routes(), userPage.allowedMethods())
-app.use(sellerApi.routes(), userApi.allowedMethods())
+app.use(page.routes(), page.allowedMethods())
+app.use(api.routes(), api.allowedMethods())
 app.on('error', (err, ctx) => {
   console.error('server error', err, ctx)
 })
-app.listen(port, () => {
+app.listen(config.port, () => {
   console.log(`server start at port ${port}`)
 })
 // 导出 koa 实例（用于测试）

@@ -47,10 +47,10 @@ const UserSchema = new Schema({
     openID: [String],
     unionID: String
   },
-  shops: [{
-    type: ObjectId,
-    ref: 'Shop'
-  }], // 商家才有
+  // shops: [{ // 商家才有
+  //   type: ObjectId,
+  //   ref: 'Shop'
+  // }], 
   // follow: {
   //   shops: [{type: ObjectId, ref: 'Shop'}],
   //   goods: [{type: ObjectId, ref: 'Goods'}],

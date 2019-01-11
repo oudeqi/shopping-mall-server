@@ -56,5 +56,16 @@ export default class Seller {
       }
     }
   }
+
+  /**
+   * 用户退出登录
+   */
+  static async logout (ctx, next) {
+    ctx.session.user = null
+    return ctx.body = {
+      success: true,
+      msg: '退出登录成功'
+    }
+  }
 }
 

@@ -6,6 +6,7 @@
   "scripts": {
     "start": "SET NODE_ENV=development && node app.js",
     "dev": "SET NODE_ENV=development && nodemon app.js",
+    "dev-mac": "export NODE_ENV=development && nodemon app.js",
     "prd": "SET NODE_ENV=production && pm2 start app.js",
     "test": "SET NODE_ENV=development && node test/index.js"
   },
